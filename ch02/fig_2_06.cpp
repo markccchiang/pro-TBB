@@ -22,31 +22,31 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 SPDX-License-Identifier: MIT
 */
 
-#include <vector>
 #include <tbb/tbb.h>
+#include <vector>
 
 void f(int v);
 
-void fig_2_6(int N, const std::vector<int>& a) {
-  tbb::parallel_for(0, N, 1, [a](int i) {
-    f(a[i]);
-  });
+void fig_2_6(int N, const std::vector<int> &a) {
+  tbb::parallel_for(0, N, 1, [a](int i) { f(a[i]); });
 }
 
-void serialImpl(int N, const std::vector<int>& a) {
+void serialImpl(int N, const std::vector<int> &a) {
   for (int i = 0; i < N; ++i) {
     f(a[i]);
   }
 }
 
 void spinWaitForAtLeast(double sec) {
-  if (sec == 0.0) return;
+  if (sec == 0.0)
+    return;
   tbb::tick_count t0 = tbb::tick_count::now();
-  while ((tbb::tick_count::now() - t0).seconds() < sec);
+  while ((tbb::tick_count::now() - t0).seconds() < sec)
+    ;
 }
 
 void f(int v) {
-  if (v%2) {
+  if (v % 2) {
     spinWaitForAtLeast(0.001);
   } else {
     spinWaitForAtLeast(0.002);
@@ -54,10 +54,12 @@ void f(int v) {
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
-    tbb::tick_count t0 = tbb::tick_count::now();
-    while ((tbb::tick_count::now() - t0).seconds() < 0.01);
-  });
+  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(),
+                    [](int) {
+                      tbb::tick_count t0 = tbb::tick_count::now();
+                      while ((tbb::tick_count::now() - t0).seconds() < 0.01)
+                        ;
+                    });
 }
 
 #include <algorithm>
@@ -86,8 +88,7 @@ int main() {
 
   std::cout << "serial_time == " << serial_time << " seconds" << std::endl
             << "parallel_time == " << parallel_time << " seconds" << std::endl
-            << "speedup == " << serial_time/parallel_time << std::endl;
+            << "speedup == " << serial_time / parallel_time << std::endl;
 
   return 0;
 }
-

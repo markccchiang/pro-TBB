@@ -26,9 +26,9 @@ SPDX-License-Identifier: MIT
 #define NOMINMAX
 
 #include <iostream>
-#include <vector>
 #include <limits>
 #include <tbb/tbb.h>
+#include <vector>
 
 struct DataItem {
   int id;
@@ -40,15 +40,13 @@ using QSVector = std::vector<DataItem>;
 
 static void serialQuicksort(QSVector::iterator b, QSVector::iterator e);
 
-void fig_2_3(QSVector& v1, QSVector& v2) {
-  tbb::parallel_invoke(
-    [&v1]() { serialQuicksort(v1.begin(), v1.end()); },
-    [&v2]() { serialQuicksort(v2.begin(), v2.end()); }
-  );
+void fig_2_3(QSVector &v1, QSVector &v2) {
+  tbb::parallel_invoke([&v1]() { serialQuicksort(v1.begin(), v1.end()); },
+                       [&v2]() { serialQuicksort(v2.begin(), v2.end()); });
 }
 
-#include <random>
 #include <cfloat>
+#include <random>
 
 static QSVector makeQSData(int N) {
   QSVector v;
@@ -62,7 +60,7 @@ static QSVector makeQSData(int N) {
   return v;
 }
 
-static bool checkIsSorted(const QSVector& v) {
+static bool checkIsSorted(const QSVector &v) {
   double max_value = std::numeric_limits<double>::min();
   for (auto e : v) {
     if (e.value < max_value) {
@@ -75,28 +73,33 @@ static bool checkIsSorted(const QSVector& v) {
 }
 
 static void serialQuicksort(QSVector::iterator b, QSVector::iterator e) {
-  if (b >= e) return;
+  if (b >= e)
+    return;
 
   // do shuffle
   double pivot_value = b->value;
-  QSVector::iterator i = b, j = e-1;
+  QSVector::iterator i = b, j = e - 1;
   while (i != j) {
-    while (i != j && pivot_value < j->value) --j;
-    while (i != j && i->value <= pivot_value) ++i;
+    while (i != j && pivot_value < j->value)
+      --j;
+    while (i != j && i->value <= pivot_value)
+      ++i;
     std::iter_swap(i, j);
   }
   std::iter_swap(b, i);
 
   // recursive call
   serialQuicksort(b, i);
-  serialQuicksort(i+1, e);
+  serialQuicksort(i + 1, e);
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
-    tbb::tick_count t0 = tbb::tick_count::now();
-    while ((tbb::tick_count::now() - t0).seconds() < 0.01);
-  });
+  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(),
+                    [](int) {
+                      tbb::tick_count t0 = tbb::tick_count::now();
+                      while ((tbb::tick_count::now() - t0).seconds() < 0.01)
+                        ;
+                    });
 }
 
 int main(int argc, char *argv[]) {
@@ -130,8 +133,7 @@ int main(int argc, char *argv[]) {
 
   std::cout << "serial_time == " << serial_time << " seconds" << std::endl
             << "parallel_time == " << parallel_time << " seconds" << std::endl
-            << "speedup == " << serial_time/parallel_time << std::endl;
+            << "speedup == " << serial_time / parallel_time << std::endl;
 
   return 0;
 }
-
