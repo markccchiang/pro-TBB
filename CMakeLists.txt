@@ -13,3 +13,4 @@ INCLUDE_DIRECTORIES(/usr/local/include)
 LINK_DIRECTORIES(/usr/local/lib)
 
 add_subdirectory(ch01)
+add_subdirectory(ch02)
