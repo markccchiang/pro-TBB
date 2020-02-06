@@ -31,21 +31,20 @@ SPDX-License-Identifier: MIT
 #include <tbb/tbb.h>
 
 using CaseStringPtr = std::shared_ptr<std::string>;
-CaseStringPtr getCaseString(std::ofstream& f); 
-void writeCaseString(std::ofstream& f, CaseStringPtr s);
+CaseStringPtr getCaseString(std::ofstream &f);
+void writeCaseString(std::ofstream &f, CaseStringPtr s);
 
-void fig_2_24(std::ofstream& caseBeforeFile, std::ofstream& caseAfterFile) {
+void fig_2_24(std::ofstream &caseBeforeFile, std::ofstream &caseAfterFile) {
   while (CaseStringPtr s_ptr = getCaseString(caseBeforeFile)) {
-    std::transform(s_ptr->begin(), s_ptr->end(), s_ptr->begin(), 
-      [](char c) -> char {
-        if (std::islower(c))
-          return std::toupper(c);
-        else if (std::isupper(c))
-          return std::tolower(c);
-        else
-          return c;
-      }
-    );
+    std::transform(s_ptr->begin(), s_ptr->end(), s_ptr->begin(),
+                   [](char c) -> char {
+                     if (std::islower(c))
+                       return std::toupper(c);
+                     else if (std::isupper(c))
+                       return std::tolower(c);
+                     else
+                       return c;
+                   });
     writeCaseString(caseAfterFile, s_ptr);
   }
 }
@@ -62,7 +61,7 @@ void initCaseChange(int num_strings, int string_len, int free_list_size) {
   }
 }
 
-CaseStringPtr getCaseString(std::ofstream& f) {
+CaseStringPtr getCaseString(std::ofstream &f) {
   std::shared_ptr<std::string> s;
   if (numCaseInputs > 0) {
     if (!caseFreeList.try_pop(s) || !s) {
@@ -71,12 +70,12 @@ CaseStringPtr getCaseString(std::ofstream& f) {
     }
     int ascii_range = 'z' - 'A' + 2;
     for (int i = 0; i < s->size(); ++i) {
-      int offset = i%ascii_range;
+      int offset = i % ascii_range;
       if (offset)
-        (*s)[i] = 'A' + offset - 1; 
+        (*s)[i] = 'A' + offset - 1;
       else
         (*s)[i] = '\n';
-    } 
+    }
     if (f.good()) {
       f << *s;
     }
@@ -85,7 +84,7 @@ CaseStringPtr getCaseString(std::ofstream& f) {
   return s;
 }
 
-void writeCaseString(std::ofstream& f, CaseStringPtr s) {
+void writeCaseString(std::ofstream &f, CaseStringPtr s) {
   if (f.good()) {
     f << *s;
   }
@@ -93,7 +92,7 @@ void writeCaseString(std::ofstream& f, CaseStringPtr s) {
 }
 
 int main() {
-  int num_strings = 100; 
+  int num_strings = 100;
   int string_len = 100000;
   int free_list_size = 1;
 
@@ -110,4 +109,3 @@ int main() {
   std::cout << "serial_time == " << serial_time << " seconds" << std::endl;
   return 0;
 }
-

@@ -34,9 +34,9 @@ double fig_2_11(int num_intervals) {
   double dx = 1.0 / num_intervals;
   double sum = 0.0;
   for (int i = 0; i < num_intervals; ++i) {
-    double x = (i+0.5)*dx;
-    double h = std::sqrt(1-x*x);
-    sum += h*dx;
+    double x = (i + 0.5) * dx;
+    double h = std::sqrt(1 - x * x);
+    sum += h * dx;
   }
   double pi = 4 * sum;
   return pi;
@@ -55,4 +55,3 @@ int main() {
   std::cout << "serial_time == " << serial_time << " seconds" << std::endl;
   return 0;
 }
-

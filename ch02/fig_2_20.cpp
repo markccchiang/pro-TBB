@@ -23,29 +23,29 @@ SPDX-License-Identifier: MIT
 */
 
 #include <iostream>
-#include <vector>
 #include <tbb/tbb.h>
+#include <vector>
 
-void fig_2_20(std::vector<double>& x, const std::vector<double>& a, 
-              std::vector<double>& b) {
+void fig_2_20(std::vector<double> &x, const std::vector<double> &a,
+              std::vector<double> &b) {
   const int N = x.size();
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < i; ++j) {
-      b[i] -= a[j + i*N] * x[j];
+      b[i] -= a[j + i * N] * x[j];
     }
-    x[i] = b[i] / a[i + i*N];
+    x[i] = b[i] / a[i + i * N];
   }
 }
 
-static std::vector<double> initForwardSubstitution(std::vector<double>& x, 
-                                                   std::vector<double>& a, 
-                                                   std::vector<double>& b) {
+static std::vector<double> initForwardSubstitution(std::vector<double> &x,
+                                                   std::vector<double> &a,
+                                                   std::vector<double> &b) {
   const int N = x.size();
   for (int i = 0; i < N; ++i) {
     x[i] = 0;
-    b[i] = i*i;
+    b[i] = i * i;
     for (int j = 0; j <= i; ++j) {
-      a[j + i*N] = 1 + j*i;
+      a[j + i * N] = 1 + j * i;
     }
   }
 
@@ -53,9 +53,9 @@ static std::vector<double> initForwardSubstitution(std::vector<double>& x,
   std::vector<double> x_gold = x;
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < i; ++j) {
-      b_tmp[i] -= a[j + i*N] * x_gold[j];
+      b_tmp[i] -= a[j + i * N] * x_gold[j];
     }
-    x_gold[i] = b_tmp[i] / a[i + i*N];
+    x_gold[i] = b_tmp[i] / a[i + i * N];
   }
   return x_gold;
 }
@@ -63,22 +63,21 @@ static std::vector<double> initForwardSubstitution(std::vector<double>& x,
 int main() {
   const int N = 32768;
 
-  std::vector<double> a(N*N);
+  std::vector<double> a(N * N);
   std::vector<double> b(N);
   std::vector<double> x(N);
 
-  auto x_gold = initForwardSubstitution(x,a,b);
+  auto x_gold = initForwardSubstitution(x, a, b);
 
   double serial_time = 0.0;
   {
     tbb::tick_count t0 = tbb::tick_count::now();
-    fig_2_20(x,a,b);
+    fig_2_20(x, a, b);
     serial_time = (tbb::tick_count::now() - t0).seconds();
   }
-  if ( x_gold != x ) {
+  if (x_gold != x) {
     std::cerr << "Error: results do not match gold version" << std::endl;
   }
   std::cout << "serial_time == " << serial_time << " seconds" << std::endl;
   return 0;
 }
-

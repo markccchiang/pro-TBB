@@ -33,31 +33,30 @@ SPDX-License-Identifier: MIT
 double fig_2_12(int num_intervals) {
   double dx = 1.0 / num_intervals;
   double sum = tbb::parallel_reduce(
-    /* range = */ tbb::blocked_range<int>(0, num_intervals), 
-    /* idenity = */ 0.0,
-    /* func */ 
-    [=](const tbb::blocked_range<int>& r, double init) -> double {
-      for (int i = r.begin(); i != r.end(); ++i) {
-        double x = (i + 0.5)*dx;
-        double h = std::sqrt(1 - x*x);
-        init += h*dx;
-      }
-      return init;
-    },
-    /* reduction */
-    [](double x, double y) -> double {
-      return x + y;
-    }
-  );
+      /* range = */ tbb::blocked_range<int>(0, num_intervals),
+      /* idenity = */ 0.0,
+      /* func */
+      [=](const tbb::blocked_range<int> &r, double init) -> double {
+        for (int i = r.begin(); i != r.end(); ++i) {
+          double x = (i + 0.5) * dx;
+          double h = std::sqrt(1 - x * x);
+          init += h * dx;
+        }
+        return init;
+      },
+      /* reduction */
+      [](double x, double y) -> double { return x + y; });
   double pi = 4 * sum;
   return pi;
 }
 
 static void warmupTBB() {
-  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(), [](int) {
-    tbb::tick_count t0 = tbb::tick_count::now();
-    while ((tbb::tick_count::now() - t0).seconds() < 0.01);
-  });
+  tbb::parallel_for(0, tbb::task_scheduler_init::default_num_threads(),
+                    [](int) {
+                      tbb::tick_count t0 = tbb::tick_count::now();
+                      while ((tbb::tick_count::now() - t0).seconds() < 0.01)
+                        ;
+                    });
 }
 
 int main() {
@@ -74,4 +73,3 @@ int main() {
   std::cout << "parallel_time == " << parallel_time << " seconds" << std::endl;
   return 0;
 }
-
